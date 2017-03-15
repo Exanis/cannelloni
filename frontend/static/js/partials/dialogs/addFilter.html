@@ -1,0 +1,34 @@
+<md-dialog aria-label="Ajouter un filtre">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 flex>Ajouter un nouveau filtre</h2>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-tooltip md-direction="left">Annuler et fermer</md-tooltip>
+                    <md-icon md-font-set="material-icons">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <br />
+            <md-input-container>
+                <label>Nom</label>
+                <input ng-model="name" />
+            </md-input-container><br />
+
+            <md-input-container>
+                <label>Type</label>
+                <md-select ng-model="target">
+                    <md-option ng-repeat="type in types" ng-value="type">{{ type.name }}</md-option>
+                </md-select>
+            </md-input-container>
+
+            <div>{{ target.description }}</div>
+
+            <div class="text-center">
+                <md-button class="md-raised md-primary" ng-click="create()">Créer</md-button>
+            </div>
+        </md-dialog-content>
+    </form>
+</md-dialog>

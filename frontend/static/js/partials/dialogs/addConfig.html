@@ -1,0 +1,26 @@
+<md-dialog aria-label="Choisissez une valeur">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 flex>Choisissez une valeur</h2>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-tooltip md-direction="left">Annuler et fermer</md-tooltip>
+                    <md-icon md-font-set="material-icons">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <md-input-container>
+                <label>Variable</label>
+                <md-select ng-model="target">
+                    <md-option ng-repeat="variable in list" ng-value="variable.uuid">{{ variable.name }}</md-option>
+                </md-select>
+            </md-input-container><br />
+            
+            <div class="text-center">
+                <md-button class="md-raised md-primary" ng-click="choose()">Choisir</md-button>
+            </div>
+        </md-dialog-content>
+    </form>
+</md-dialog>

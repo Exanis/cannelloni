@@ -87,3 +87,10 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Cannelloni settings
+runner/status/*-*
+db.sqlite3
+files/*-*
+cannelloni/local.py
+*/migrations

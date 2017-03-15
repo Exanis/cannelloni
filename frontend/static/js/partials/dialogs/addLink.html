@@ -1,0 +1,40 @@
+<md-dialog aria-label="Créer un lien">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 flex>Créer un lien</h2>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-tooltip md-direction="left">Annuler et fermer</md-tooltip>
+                    <md-icon md-font-set="material-icons">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <md-input-container>
+                <label>Noeud d'origine</label>
+                <md-select ng-model="origin">
+                    <md-option ng-repeat="node in types[currentFilter['target']]['node_out']" ng-value="node">{{ node }}</md-option>
+                </md-select>
+            </md-input-container><br />
+            
+            <md-input-container>
+                <label>Filtre de destination</label>
+                <md-select ng-model="targetFilter">
+                    <md-option ng-repeat="filter in possibleFilters" ng-value="filter">{{ filter.name }}</md-option>
+                </md-select>
+            </md-input-container><br />
+            
+            <md-input-container>
+                <label>Noeud de destination</label>
+                <md-select ng-model="targetNode">
+                    <md-option ng-repeat="node in types[targetFilter['target']]['node_in']" ng-value="node">{{ node }}</md-option>
+                </md-select>
+            </md-input-container><br />
+            
+            <div class="text-center">
+                <md-button class="md-raised md-primary" ng-click="link()">Choisir</md-button>
+            </div>
+        </md-dialog-content>
+    </form>
+</md-dialog>

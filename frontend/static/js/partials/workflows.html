@@ -1,0 +1,29 @@
+<br />
+<div class="col-md-4 col-md-offset-4">
+    <div md-whiteframe="4">
+        <md-toolbar layout="row">
+            <div class="md-toolbar-tools">
+                <h2 flex md-truncate>Choisissez un workflow</h2>
+
+                <md-button class="md-icon-button md-fab md-mini md-primary md-hue-3" ng-click="add($event)" aria-label="Créer un workflow">
+                    <md-tooltip md-direction="left">Créer un workflow</md-tooltip>
+                    <md-icon md-font-set="material-icons">add</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-content>
+            <md-list>
+                <md-list-item class="md-2-line" ng-repeat="workflow in list" ng-click="choose(workflow)">
+                    <md-icon class="material-icons md-avatar">group_work</md-icon>
+                    <div class="md-list-item-text" layout="column">
+                        <h3>{{ workflow.name }}</h3>
+                        <p></p>
+                    </div>
+                </md-list-item>
+            </md-list>
+        </md-content>
+    </div>
+</div>
+
+<div ng-include="'/static/js/partials/menu.html'"></div>

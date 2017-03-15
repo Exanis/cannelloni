@@ -1,0 +1,63 @@
+<md-toolbar class="md-hue-2 topbar">
+    <div class="md-toolbar-tools">
+        <h2 flex md-truncate>Variables dans ce namespace</h2>
+
+        <md-button class="md-fab md-hue-3 md-mini" aria-label="Ajouter un groupe de variables" ng-click="addGroup($event)">
+            <md-tooltip md-direction="left">Ajouter un groupe</md-tooltip>
+            <md-icon md-font-set="material-icons">add</md-icon>
+        </md-button>
+    </div>
+</md-toolbar>
+
+<div class="toolbar-space"></div>
+
+<div class="col-md-offset-1 col-md-10">
+    <div ng-repeat="group in groupsData" class="col-md-6">
+        <div md-whiteframe="4">
+            <md-toolbar>
+                <div class="md-toolbar-tools">
+                    <h2 flex md-truncate>{{ group['group'].name }}</h2>
+                    
+                    <md-button class="md-icon-button md-fab md-mini md-primary md-hue-3" aria-label="Ajouter une variable" ng-click="addVariable($event, group['group'].uuid)">
+                        <md-tooltip md-direction="left">Ajouter une variable</md-tooltip>
+                        <md-icon md-font-set="material-icons">add</md-icon>
+                    </md-button>
+                    
+                    <md-button class="md-icon-button md-fab md-mini md-hue-3" aria-label="Supprimer le groupe" ng-click="deleteGroup($event, group['group'].uuid)">
+                        <md-tooltip md-direction="right">Supprimer le groupe</md-tooltip>
+                        <md-icon md-font-set="material-icons">remove</md-icon>
+                    </md-button>
+                </div>
+            </md-toolbar>
+
+            <md-content>
+                <md-list>
+                    <md-list-item class="md-3-line" ng-repeat="variable in group['variables']">
+                        <md-icon class="material-icons md-avatar">{{ getTypeIcon(variable.type_class) }}</md-icon>
+                        <div class="md-list-item-text" layout="column">
+                            <h3>{{ variable.name }}</h3>
+                            <h4>{{ getTypeClass(variable.type_class) }}</h4>
+                            <p><strong>Valeur: </strong> {{ variable.value }}</p>
+                        </div>
+                        <md-menu class="md-secondary">
+                            <md-button class="md-icon-button md-mini">
+                                <md-tooltip md-direction="left">Menu</md-tooltip>
+                                <md-icon md-font-set="material-icons">menu</md-icon>
+                            </md-button>
+                            <md-menu-content>
+                                <md-menu-item>
+                                    <md-button ng-click="editVariable($event, variable)">Modifier valeur</md-button>
+                                </md-menu-item>
+                                <md-menu-item>
+                                    <md-button ng-click="deleteVariable($event, variable.uuid)">Supprimer</md-button>
+                                </md-menu-item>
+                            </md-menu-content>
+                        </md-menu>
+                    </md-list-item>
+                </md-list>
+            </md-content>
+        </div><br />
+    </div>
+</div>
+
+<div ng-include="'/static/js/partials/menu.html'"></div>

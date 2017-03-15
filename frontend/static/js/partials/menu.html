@@ -1,0 +1,32 @@
+<div ng-controller="menuCtrl">
+    <md-fab-speed-dial md-direction="up" class="md-fab-bottom-left md-scale">
+        <md-fab-trigger>
+            <md-button aria-label="menu" class="md-fab md-hue-3">
+                <md-tooltip md-direction="right">Menu</md-tooltip>
+                <md-icon md-font-set="material-icons">menu</md-icon>
+            </md-button>
+        </md-fab-trigger>
+
+        <md-fab-actions>
+            <md-button aria-label="Déconnexion" class="md-fab md-mini md-raised" ng-click="logout()">
+                <md-tooltip md-direction="right">Déconnexion</md-tooltip>
+                <md-icon md-font-set="material-icons">exit_to_app</md-icon>
+            </md-button>
+
+            <md-button aria-label="Workflow" class="md-fab md-mini md-raised" ng-click="workflow()">
+                <md-tooltip md-direction="right">Workflow</md-tooltip>
+                <md-icon md-font-set="material-icons">group_work</md-icon>
+            </md-button>
+
+            <md-button aria-label="Variables" class="md-fab md-mini md-raised" ng-click="variables()">
+                <md-tooltip md-direction="right">Variables</md-tooltip>
+                <md-icon md-font-set="material-icons">code</md-icon>
+            </md-button>
+
+            <md-button aria-label="Namespace" class="md-fab md-mini md-raised" ng-click="namespace()">
+                <md-tooltip md-direction="right">Namespace</md-tooltip>
+                <md-icon md-font-set="material-icons">extension</md-icon>
+            </md-button>
+        </md-fab-actions>
+    </md-fab-speed-dial>
+</div>

@@ -1,0 +1,25 @@
+<md-dialog aria-label="Modifier une variable">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 flex>Modifier une variable</h2>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-tooltip md-direction="left">Annuler et fermer</md-tooltip>
+                    <md-icon md-font-set="material-icons">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <br />
+            <md-input-container>
+                <label>Nouvelle valeur</label>
+                <input ng-model="value" type="number" step="1" />
+            </md-input-container><br />
+
+            <div class="text-center">
+                <md-button class="md-raised md-primary" ng-click="send()">Mettre à jour</md-button>
+            </div>
+        </md-dialog-content>
+    </form>
+</md-dialog>

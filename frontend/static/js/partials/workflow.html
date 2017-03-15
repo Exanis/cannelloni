@@ -1,0 +1,153 @@
+<md-toolbar class="md-hue-2 topbar">
+    <div class="md-toolbar-tools">
+        <h2 flex md-truncate>
+            {{ workflow.name }}
+
+            <small ng-if="status != ''">
+                {{ status }}
+            </small>
+        </h2>
+
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="!playing" aria-label="Jouer le workflow" ng-click="runWorkflow()">
+            <md-tooltip md-direction="bottom">Jouer le workflow</md-tooltip>
+            <md-icon md-font-set="material-icons">play_arrow</md-icon>
+        </md-button>
+
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="watchId != ''" aria-label="Journal d'exécution'" ng-click="log($event)">
+            <md-tooltip md-direction="bottom">Journal d'exécution</md-tooltip>
+            <md-icon md-font-set="material-icons">history</md-icon>
+        </md-button>
+
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" aria-label="Ajouter un calque" ng-click="addLayer($event)">
+            <md-tooltip md-direction="bottom">Ajouter un calque</md-tooltip>
+            <md-icon md-font-set="material-icons">add</md-icon>
+        </md-button>
+    </div>
+</md-toolbar>
+
+<div class="toolbar-space"></div>
+
+<div ng-repeat="layer in layersData" class="col-md-10 col-md-offset-1">
+    <div md-whiteframe="4">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h4 flex>{{ layer['layer'].name }}</h4>
+                
+                <md-menu>
+                    <md-button aria-label="menu" class="md-fab md-hue-3 md-mini" ng-click="$mdMenu.open($event)">
+                        <md-tooltip md-direction="top">Menu</md-tooltip>
+                        <md-icon md-font-set="material-icons">menu</md-icon>
+                    </md-button>
+
+                    <md-menu-content>
+                        <md-menu-item>
+                            <md-button aria-label="Monter" ng-click="moveLayer(layer['layer'].uuid, 1)">
+                                <md-icon md-font-set="material-icons">keyboard_arrow_up</md-icon>
+                                Monter
+                            </md-button>
+                        </md-menu-item>
+
+                        <md-menu-item>
+                            <md-button aria-label="Descendre" ng-click="moveLayer(layer['layer'].uuid, 0)">
+                                <md-icon md-font-set="material-icons">keyboard_arrow_down</md-icon>
+                                Descendre
+                            </md-button>
+                        </md-menu-item>
+
+                        <md-menu-divider></md-menu-divider>
+
+                        <md-menu-item>
+                            <md-button aria-label="Ajouter un filtre" ng-click="addFilter($event, layer['layer'].uuid)">
+                                <md-icon md-font-set="material-icons">add</md-icon>
+                                Ajouter un filtre
+                            </md-button>
+                        </md-menu-item>
+
+                        <md-menu-item>
+                            <md-button aria-label="Supprimer le calque" ng-click="deleteLayer($event, layer['layer'].uuid)">
+                                <md-icon md-font-set="material-icons">remove</md-icon>
+                                Supprimer le calque
+                            </md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </div>
+        </md-toolbar>
+
+        <div class="padded">
+            <md-grid-list
+                md-cols-xs="1" md-cols-sm="2" md-cols-md="2" md-cols-gt-md="4"
+                md-row-height-gt-md="1:1.5" md-row-height="1:1.5"
+                md-gutter="12px" md-gutter-gt-sm="8px">
+                <md-grid-tile md-whiteframe="4" ng-repeat="filter in layer['filters']" ng-class="{active: filter.uuid == currentlyRunning}" id="{{ filter.uuid }}">
+                    <md-grid-tile-header>
+                        <h3>{{ filter.name }} <small>{{ types[filter.target].name }}</small></h3>
+                    </md-grid-tile-header>
+
+                    <md-content flex md-truncate class="full">
+                        <h4>Paramètres</h4>
+
+                        <a ng-repeat="config in types[filter.target].parameters" class="decalled" ng-click="selectVariable($event, filter, config)">
+                            <strong>{{ config.name }}</strong>:
+                            <span ng-if="(param = getParameterForConfig(config.key, filter.configurations)) == null">(Aucun)</span> 
+                            <span ng-if="param != null">
+                                {{ param.value.name }}
+                                <br />
+                                <md-icon class="pixel" md-font-set="material-icons">subdirectory_arrow_right</md-icon>
+                                <small>{{ param.value.value }}</small>
+                            </span>
+                        </a>
+                        
+                        <span ng-if="types[filter.target].node_in.length > 0">
+                            <h4>Noeuds entrants</h4>
+                            <div ng-repeat="link in filter.links_in" class="decalled">
+                                [<a ng-click="goto(link.from_uuid)">{{ link.from_filter }}</a>].[{{ link.from_node }}] <md-icon md-font-set="material-icons" class="pixel">arrow_forward</md-icon> {{ link.to }}
+                                    <md-icon ng-click="deleteLink($event, link.uuid)" class="pixel" md-font-set="material-icons">remove_circle_outline</md-icon>
+                            </div>
+                        </span>
+
+                        <span ng-if="types[filter.target].node_out.length > 0">
+                            <h4>
+                                Noeuds sortants
+                                <md-icon class="pixel" md-font-set="material-icons" ng-click="addLink($event, filter)">add_circle_outline</md-icon></h4>
+                            <div ng-repeat="link in filter.links" class="decalled">
+                                {{ link.from }} <md-icon md-font-set="material-icons" class="pixel">arrow_forward</md-icon> [<a ng-click="goto(link.to_uuid)">{{ link.to_filter }}</a>].[{{ link.to_node }}]
+                                    <md-icon ng-click="deleteLink($event, link.uuid)" class="pixel" md-font-set="material-icons">remove_circle_outline</md-icon>
+                            </div>
+                        </span>
+                    </md-content>
+
+                    <md-grid-tile-footer>
+                        <md-fab-speed-dial md-direction="right" class="md-scale">
+                            <md-fab-trigger>
+                                <md-button aria-label="menu" class="md-fab md-mini md-primary">
+                                    <md-tooltip md-direction="top">Menu</md-tooltip>
+                                    <md-icon md-font-set="material-icons">menu</md-icon>
+                                </md-button>
+                            </md-fab-trigger>
+
+                            <md-fab-actions>
+                                <md-button aria-label="Déplacer à gauche" class="md-fab md-mini md-raised" ng-click="moveFilter(filter.uuid, 1)">
+                                    <md-tooltip md-direction="top">Déplacer à gauche</md-tooltip>
+                                    <md-icon md-font-set="material-icons">keyboard_arrow_left</md-icon>
+                                </md-button>
+
+                                <md-button aria-label="Déplacer à droite" class="md-fab md-mini md-raised" ng-click="moveFilter(filter.uuid, 0)">
+                                    <md-tooltip md-direction="top">Déplacer à droite</md-tooltip>
+                                    <md-icon md-font-set="material-icons">keyboard_arrow_right</md-icon>
+                                </md-button>
+
+                                <md-button aria-label="Supprimer" class="md-fab md-mini md-raised" ng-click="deleteFilter($event, filter.uuid)">
+                                    <md-tooltip md-direction="top">Supprimer</md-tooltip>
+                                    <md-icon md-font-set="material-icons">remove</md-icon>
+                                </md-button>
+                            </md-fab-actions>
+                        </md-fab-speed-dial>
+                    </md-grid-tile-footer>
+                </md-grid-tile>
+            </md-grid-list>
+        </div>
+    </div><br />
+</div>
+
+<div ng-include="'/static/js/partials/menu.html'"></div>
