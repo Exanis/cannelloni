@@ -140,6 +140,7 @@ def filter_configure(request):
             for param in target.parameters:
                 if param['key'] == key:
                     if param['type'] == variable.type_class.slug:
+                        models.Configuration.objects.filter(target=fil, key=key).delete()
                         models.Configuration.objects.create(target=fil, key=key, value=variable)
                         return Response({'success': True})
                     else:
