@@ -3,6 +3,8 @@
 "Runner class to run a workflow"
 
 import os
+import traceback
+import sys
 from django.utils import timezone
 from backend import models, filters
 from cannelloni import settings
@@ -39,7 +41,7 @@ class Runner(object):
             with open(self._watchfile, "w+") as pointer:
                 pointer.write(str(short))
         with open(self._logfile, "a+") as pointer:
-            log = "[%s] %s\n" % (timezone.now(), str(what),)
+            log = u"[%s] %s\n" % (timezone.now(), unicode(what),)
             pointer.write(log)
 
     def _run_filter(self, target):
@@ -58,9 +60,9 @@ class Runner(object):
         try:
             target['klass'].run()
             return True
-        except Exception as e:
+        except:
             self._log(
-                "An error occured: %s" % e,
+                "An error occured: %s" % traceback.format_exc(),
                 "Error"
             )
             return False
@@ -70,7 +72,9 @@ class Runner(object):
         self._log("Starting workflow execution", "Starting")
         self._load_filters()
         self._log("Filters loaded")
-        for fil in self._ordered_filters:
-            if not self._run_filter(fil):
-                return
+        while self._registery.is_done() is False:
+            self._registery.done()
+            for fil in self._ordered_filters:
+                if not self._run_filter(fil):
+                    return
         self._log("Workflow execution ended", "Done")

@@ -124,6 +124,6 @@ def workflow_log(_, uuid):
     filename = os.path.join(settings.BASE_DIR, "runner", "status", "%s.log" % uuid)
     try:
         with open(filename, 'r') as pointer:
-            return Response({'log': pointer.read().replace("\n", '<br />')})
+            return Response({'log': "<pre>%s</pre>" % pointer.read().replace("\n", '<br />')})
     except IOError:
         return Response({'log': 'Workflow failed to start'})
