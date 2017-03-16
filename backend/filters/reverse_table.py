@@ -18,16 +18,13 @@ class ReverseTable(AbstractFilter):
     def run(self):
         "Reverse the table"
         flux = self._flux_in['origine']
-        if len(flux['rows']) > 0 and len(flux['headers']) > 0:
-            headers = [flux['headers'][0]] + [line[0] for line in flux['rows']]
-            rows = [
-                [value] + [line[ind + 1] for line in flux['rows']]
-                for ind, value in enumerate(flux['headers'][1:])
-            ]
-            output = {
-                'headers': headers,
-                'rows': rows
-            }
-            self._flux_out['resultat'] = output
-        else:
-            self._flux_out['resultat'] = copy(flux)
+        headers = [flux['headers'][0]] + [line[0] for line in flux['rows']]
+        rows = [
+            [value] + [line[ind + 1] for line in flux['rows']]
+            for ind, value in enumerate(flux['headers'][1:])
+        ]
+        output = {
+            'headers': headers,
+            'rows': rows
+        }
+        self._flux_out['resultat'] = output
