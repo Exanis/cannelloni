@@ -2,7 +2,6 @@
 
 "Filter definition for ReverseTable"
 
-from copy import copy
 from .abstract import AbstractFilter
 
 class ReverseTable(AbstractFilter):
