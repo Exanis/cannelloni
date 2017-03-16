@@ -24,7 +24,7 @@ class SpaceTable(AbstractFilter):
         }
         for line in flux['rows']:
             if output['headers'] is None:
-                output['headers'] = line.split()
-            else:
-                output['rows'].append(line.split())
+                output['headers'] = line[0].split()
+            elif line[0] is not '':
+                output['rows'].append(line[0].split())
         self._flux_out['resultat'] = output

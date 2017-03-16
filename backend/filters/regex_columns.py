@@ -42,14 +42,23 @@ class RegexColumns(AbstractFilter):
         lines = [line[column] for line in flux['rows'] if column < len(line)]
         output = {
             'headers': [header],
-            'rows': [[]]
+            'rows': []
         }
+        tmp = [[]]
+        longest = 0
         for line in lines:
             match = re.search(regex, line)
             if match is not None:
                 output['headers'].append(match.group(1))
-                output['rows'].append([])
+                tmp.append([])
                 current = current + 1
             else:
-                output['rows'][current].append(line)
+                tmp[current].append(line)
+                if len(tmp[current]) > longest:
+                    longest = len(tmp[current])
+        output['rows'] = [
+            [
+                col[row] if row < len(col) else '' for col in tmp
+            ] for row in range(longest)
+        ]
         self._flux_out['resultat'] = output

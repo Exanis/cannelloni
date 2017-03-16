@@ -42,18 +42,27 @@ class UnderlineColumns(AbstractFilter):
         lines = [line[column] for line in flux['rows']]
         output = {
             'headers': [header],
-            'rows': [[]]
+            'rows': []
         }
+        tmp = [[]]
+        longest = 0
         for line in lines:
-            if all(letter in underline for letter in line):
+            if len(line) > 0 and all(letter in underline for letter in line):
                 output['headers'].append(prev)
-                output['rows'].append([])
+                tmp.append([])
                 current = current + 1
                 prev = None
             else:
                 if prev is not None:
-                    output['rows'][current].append(prev)
+                    tmp[current].append(prev)
+                if len(tmp[current]) > longest:
+                    longest = len(tmp[current])
                 prev = line
         if prev is not None:
-            output['rows'][current].append(prev)
+            tmp[current].append(prev)
+        output['rows'] = [
+            [
+                col[row] if row < len(col) else '' for col in tmp
+            ] for row in range(longest)
+        ]
         self._flux_out['resultat'] = output

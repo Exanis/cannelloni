@@ -22,3 +22,5 @@ from .underline_columns import UnderlineColumns
 from .until import Until
 from .concat import Concat
 from .column_name import ColumnName
+from .empty_lines import EmptyLines
+from .space_table import SpaceTable

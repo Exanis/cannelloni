@@ -100,7 +100,7 @@ def workflow_run(request, uuid):
     if 'view_namespace' in get_perms(request.user, workflow.namespace):
         watch = uuid4()
         Popen([
-            os.path.join(settings.BASE_DIR, 'run.sh'),
+            os.path.join(settings.BASE_DIR, 'run.bat'),
             str(uuid),
             str(watch)
         ])

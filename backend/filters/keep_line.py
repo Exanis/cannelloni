@@ -27,6 +27,6 @@ class KeepLine(AbstractFilter):
         target = self._param('target')
         output = {
             'headers': copy(flux['headers']),
-            'rows': [copy(flux['rows'][target])]
+            'rows': [copy(flux['rows'][target]) if target < len(flux['rows']) else []]
         }
         self._flux_out['resultat'] = output

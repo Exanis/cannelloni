@@ -292,6 +292,7 @@ app.config(['$routeProvider', function ($routeProvider) {
         function addLinkCtrl($scope, $mdDialog, namespace) {
             $scope.types = typesList;
             $scope.currentFilter = targetFilter;
+
             $scope.possibleFilters = allFiltersList;
 
             $scope.cancel = function () {
