@@ -39,7 +39,7 @@ class RegexColumns(AbstractFilter):
         regex = self._param('regex')
         current = 0
         column = flux['headers'].index(target)
-        lines = [line[column] for line in flux['rows']]
+        lines = [line[column] for line in flux['rows'] if column < len(line)]
         output = {
             'headers': [header],
             'rows': [[]]

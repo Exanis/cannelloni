@@ -27,7 +27,7 @@ class ColumnSplit(AbstractFilter):
         column_id = origin['headers'].index(column)
         self._flux_out['colonne'] = {
             'headers': [column],
-            'rows': [[row[column_id]] for row in origin['rows'] if column_id in row]
+            'rows': [[row[column_id]] for row in origin['rows'] if column_id < len(row)]
         }
         self._flux_out['reste'] = {
             'headers': origin['headers'][:column_id] + origin['headers'][column_id + 1:],
