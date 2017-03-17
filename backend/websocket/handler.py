@@ -15,19 +15,18 @@ class Handler(JsonWebsocketConsumer):
 
     _handlers = {}
 
-    def _update_status(self, flux, watch):
-        print "start"
+    def _update_status(self, flux):
         for line in iter(flux.readline, b''):
-            print "======%s" % line
+            line = line.strip()
             if line == "Error":
                 self.send({'command': 'status', "status": "Error"})
             else:
                 self.send({'command': 'status', "status": "Running", "filter": line})
         self.send({'command': 'status', "status": "Done"})
-        self._handlers[watch].close()
 
     def _say(self, uuid, command):
-        self._handlers[uuid].write("%s\n" % command)
+        with open(self._handlers[uuid], 'w') as target:
+            target.write(command)
 
     def _play(self, params, step):
         workflow_id = params['uuid']
@@ -38,17 +37,18 @@ class Handler(JsonWebsocketConsumer):
             workflow_id,
             watch
         ]
-        if step:
-            params.append("--step")
-        process = subprocess.Popen(params, stdout=subprocess.PIPE, bufsize=1)
-        print "%s.%s" % (workflow_id, watch,)
-        file_handler = open(os.path.join(
+        command_file_path = os.path.join(
             settings.BASE_DIR,
             "runner",
             "status",
-            "%s--.%d" % (workflow_id, process.pid,)), "w+")
-        self._handlers[watch] = file_handler
-        thread = Thread(target=self._update_status, args=(process.stdout, watch,))
+            "%s.%s" % (workflow_id, watch,))
+        if step:
+            params.append("--step")
+            with open(command_file_path, 'w+') as _: # Just create file
+                pass
+        process = subprocess.Popen(params, stdout=subprocess.PIPE, bufsize=1)
+        self._handlers[watch] = command_file_path
+        thread = Thread(target=self._update_status, args=(process.stdout,))
         thread.daemon = True
         thread.start()
         self.send({'command': 'started', 'id': watch})

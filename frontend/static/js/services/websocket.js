@@ -8,9 +8,7 @@ app.factory('$websocket', ['$location', '$mdToast', function ($location, $mdToas
             ws.onopen = handler;
 
             ws.onmessage = function (e) {
-                console.log(e);
                 var data = JSON.parse(e.data);
-                console.log(data);
                 if (typeof handlers[data['command']] !== "undefined")
                     handlers[data['command']](data);
             };

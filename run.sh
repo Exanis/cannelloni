@@ -2,4 +2,4 @@
 
 source env/bin/activate
 
-python manage.py workflow $1 $2
+python manage.py workflow $1 $2 $3

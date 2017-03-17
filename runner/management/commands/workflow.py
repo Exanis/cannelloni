@@ -15,5 +15,5 @@ class Command(BaseCommand):
         parser.add_argument('--step', action='store_true')
 
     def handle(self, *args, **options):
-        runner = Runner(options['uuid'][0], options['watchfile'], options['step'])
+        runner = Runner(options['uuid'][0], options['watchfile'][0], options['step'])
         runner.run()

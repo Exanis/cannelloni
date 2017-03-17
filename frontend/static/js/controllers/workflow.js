@@ -370,13 +370,13 @@ app.config(['$routeProvider', function ($routeProvider) {
         $scope.playing = false;
         $scope.stepping = false;
         $scope.status = '';
-        $scope.currentlyRunning = '';
+        $scope.currentlyRunning = '22eb5a0f-56f5-41f8-8275-02ea2f551401';
+
+        var watchId;
 
         function _runWorkFlow (cmd) {
             $scope.playing = true;
             $scope.status = 'En attente';
-
-            var watchId;
 
             $websocket.hook('started', function (data) {
                 $scope.status = 'Démarré';
@@ -384,19 +384,19 @@ app.config(['$routeProvider', function ($routeProvider) {
             })
 
             $websocket.hook('status', function (data) {
-                console.log(data);
                 if (data.status !== 'Unchanged') {
                     $scope.status = data.status;
 
-                    if ($scope.status === "Running")
+                    if ($scope.status === "Running") {
                         $scope.currentlyRunning = data.filter;
+                    }
                 }
                 if (data.status === 'Done' || data.status === 'Error') {
                     $scope.playing = false;
                     $scope.stepping = false;
                     $scope.currentlyRunning = '';
                 }
-                $scope.$apply()
+                $scope.$apply();
             });
 
             $websocket.send(workflow.get().uuid, cmd)
@@ -412,15 +412,15 @@ app.config(['$routeProvider', function ($routeProvider) {
         };
 
         $scope.stepWorkflow = function () {
-            $websocket.send(workflow.get().uuid, "step");
+            $websocket.send(watchId, "step");
         };
 
         $scope.runWorkflow = function () {
-            $websocket.send(workflow.get().uuid, "run");
+            $websocket.send(watchId, "run");
         };
 
         $scope.quitWorkflow = function () {
-            $websocket.send(workflow.get().uuid, "quit");
+            $websocket.send(watchId, "quit");
         };
 
         $scope.log = function (ev) {
