@@ -27,8 +27,6 @@ from .workflow import (
     layers_move,
     layers_delete,
 
-    workflow_run,
-    workflow_watch,
     workflow_log
 )
 from .filters import (

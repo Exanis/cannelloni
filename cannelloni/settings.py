@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'backend',
     'frontend',
-    'runner'
+    'runner',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -54,6 +55,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     )
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "backend.routing.channel_routing"
+    }
 }
 
 ROOT_URLCONF = 'cannelloni.urls'

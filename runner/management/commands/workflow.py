@@ -11,8 +11,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('uuid', nargs=1)
-        parser.add_argument('watcher', nargs=1)
+        parser.add_argument('--step', action='store_true')
 
     def handle(self, *args, **options):
-        runner = Runner(options['uuid'][0], options['watcher'][0])
+        runner = Runner(options['uuid'][0], options['step'])
         runner.run()

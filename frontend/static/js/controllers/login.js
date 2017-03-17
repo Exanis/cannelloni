@@ -11,7 +11,8 @@ app.config(['$routeProvider', function ($routeProvider) {
     '$httpParamSerializer',
     '$location',
     '$mdToast',
-    function ($scope, $http, $httpParamSerializer, $location, $mdToast) {
+    '$websocket',
+    function ($scope, $http, $httpParamSerializer, $location, $mdToast, $websocket) {
         $scope.login = function () {
             $http({
                 method: 'POST',
@@ -25,7 +26,10 @@ app.config(['$routeProvider', function ($routeProvider) {
                 }
             }).then(function (response) {
                 if (response.data.success) {
-                    $location.path('namespace');
+                    $websocket.connect(function () {
+                        $location.path('namespace');
+                        $scope.$apply();
+                    });
                 } else {
                     $mdToast.show(
                         $mdToast.simple()

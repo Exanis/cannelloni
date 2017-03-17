@@ -27,6 +27,7 @@ urlpatterns = [
 
     url(r'^workflows/list/(?P<uuid>[a-z0-9\-]+)$', views.workflows_list),
     url(r'^workflows/create/(?P<uuid>[a-z0-9\-]+)$', views.workflows_create),
+    url(r'^workflows/log/(?P<uuid>[a-z0-9\-]+)$', views.workflow_log),
 
     url(r'^layers/list/(?P<uuid>[a-z0-9\-]+)$', views.layers_list),
     url(r'^layers/create/(?P<uuid>[a-z0-9\-]+)$', views.layers_create),
@@ -42,8 +43,4 @@ urlpatterns = [
 
     url(r'^filters/link$', views.filter_link),
     url(r'^filters/unlink/(?P<uuid>[a-z0-9\-]+)$', views.link_delete),
-
-    url(r'^workflows/run/(?P<uuid>[a-z0-9\-]+)$', views.workflow_run),
-    url(r'^workflows/status/(?P<uuid>[a-z0-9\-]+)$', views.workflow_watch),
-    url(r'^workflows/log/(?P<uuid>[a-z0-9\-]+)$', views.workflow_log),
 ]

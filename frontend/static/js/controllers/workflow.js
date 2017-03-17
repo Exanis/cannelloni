@@ -16,7 +16,8 @@ app.config(['$routeProvider', function ($routeProvider) {
     '$location',
     '$interval',
     '$anchorScroll',
-    function ($scope, $http, $httpParamSerializer, namespace, workflow, $mdDialog, $mdToast, $location, $interval, $anchorScroll) {
+    '$websocket',
+    function ($scope, $http, $httpParamSerializer, namespace, workflow, $mdDialog, $mdToast, $location, $interval, $anchorScroll, $websocket) {
         if (namespace.get() === '') {
             $location.path('namespace');
             return ;
@@ -30,6 +31,10 @@ app.config(['$routeProvider', function ($routeProvider) {
         $scope.layersData = {};
         $scope.workflow = workflow.get();
         
+        $scope.testbutton = function () {
+            $websocket.send(0, 'cool', {});
+        };
+
         var typesList = {};
         var allFiltersList = [];
 
@@ -366,45 +371,42 @@ app.config(['$routeProvider', function ($routeProvider) {
         $scope.status = '';
         $scope.currentlyRunning = '';
 
-        $scope.watchId = '';
-
         $scope.runWorkflow = function () {
-            $http.get('/ws/workflows/run/' + workflow.get().uuid)
-                 .then(function (response) {
-                     $scope.playing = true;
-                     $scope.status = 'En attente';
-                     
-                     $scope.watchId = response.data['watcher'];
-                     var statusCheck = $interval(function () {
-                         $http.get('/ws/workflows/status/' + $scope.watchId)
-                              .then(function (response) {
-                                  if (response.data['status'] == 'Starting')
-                                      $scope.status = 'Démarrage';
-                                  else if (response.data['status'] == 'Done') {
-                                      $scope.status = 'Terminé';
-                                      $scope.playing = false;
-                                      $interval.cancel(statusCheck);
-                                  } else if (response.data['status'] == 'Error') {
-                                      $scope.status = 'Erreur';
-                                      $scope.playing = false;
-                                      $interval.cancel(statusCheck);
-                                  } else {
-                                      $scope.currentlyRunning = response.data['status'];
-                                      $scope.status = 'En cours';
-                                  }
-                              })
-                     }, 2000);
-                 });
+            $scope.playing = true;
+            $scope.status = 'En attente';
+
+            var statusCheck;
+            var watchId;
+
+            $websocket.hook('started', function (data) {
+                $scope.status = 'Démarré';
+                watchId = data['id'];
+
+                statusCheck = $interval(function () {
+                    $websocket.send(watchId, 'status');
+                }, 500);
+            })
+
+            $websocket.hook('status', function (data) {
+                if (data.status !== 'Unchanged')
+                    $scope.status = data.status
+                if (data.status === 'Done') {
+                    $interval.cancel(statusCheck)
+                    $scope.playing = false;
+                }
+            });
+
+            $websocket.send(workflow.get().uuid, "play")
         };
 
         $scope.log = function (ev) {
-            $http.get('/ws/workflows/log/' + $scope.watchId)
+            $http.get('/ws/workflows/log/' + workflow.get().uuid)
                  .then(function (response) {
                      $mdDialog.show(
                         $mdDialog.alert()
                             .clickOutsideToClose(true)
                             .title('Journal d\'exécution')
-                            .htmlContent(response.data['log'])
+                            .htmlContent('<pre>' + response.data['log'] + '</pre>')
                             .ariaLabel('Journal d\'exécution')
                             .ok('Fermer')
                             .targetEvent(ev)

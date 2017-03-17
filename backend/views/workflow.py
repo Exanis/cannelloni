@@ -94,36 +94,11 @@ def layers_move(request, uuid):
     return Response({'success': False})
 
 @api_view(['GET'])
-def workflow_run(request, uuid):
-    "Run a workflow"
-    workflow = get_object_or_404(models.Workflow, uuid=uuid)
-    if 'view_namespace' in get_perms(request.user, workflow.namespace):
-        watch = uuid4()
-        Popen([
-            os.path.join(settings.BASE_DIR, 'run.bat'),
-            str(uuid),
-            str(watch)
-        ])
-        return Response({'watcher': watch})
-    return Response({})
-
-@api_view(['GET'])
-def workflow_watch(_, uuid):
-    "Watch the status of a workflow"
-    filename = os.path.join(settings.BASE_DIR, "runner", "status", uuid)
-    try:
-        with open(filename, 'r') as pointer:
-            line = pointer.readline()
-            return Response({'status': line})
-    except IOError:
-        return Response({'status': 'Error'})
-
-@api_view(['GET'])
 def workflow_log(_, uuid):
     "Get the log file for a workflow"
     filename = os.path.join(settings.BASE_DIR, "runner", "status", "%s.log" % uuid)
     try:
         with open(filename, 'r') as pointer:
-            return Response({'log': "<pre>%s</pre>" % pointer.read().replace("\n", '<br />')})
+            return Response({'log': pointer.read()})
     except IOError:
         return Response({'log': 'Workflow failed to start'})
