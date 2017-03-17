@@ -4,9 +4,9 @@
 
 import os
 import subprocess
-from json import loads
 from time import sleep
 from uuid import uuid4
+from threading import Thread
 from channels.generic.websockets import JsonWebsocketConsumer
 from cannelloni import settings
 
@@ -15,39 +15,53 @@ class Handler(JsonWebsocketConsumer):
 
     _handlers = {}
 
+    def _update_status(self, flux, watch):
+        print "start"
+        for line in iter(flux.readline, b''):
+            print "======%s" % line
+            if line == "Error":
+                self.send({'command': 'status', "status": "Error"})
+            else:
+                self.send({'command': 'status', "status": "Running", "filter": line})
+        self.send({'command': 'status', "status": "Done"})
+        self._handlers[watch].close()
+
     def _say(self, uuid, command):
-        self._handlers[uuid].stdin.write("%s\n" % command)
+        self._handlers[uuid].write("%s\n" % command)
 
-    def _listen(self, uuid):
-        return self._handlers[uuid].stdout.read()
-
-    def _play(self, params):
+    def _play(self, params, step):
         workflow_id = params['uuid']
         watch = str(uuid4())
         runner = "run.bat" if os.name == "nt" else "run.sh"
-        process = subprocess.Popen([
-            os.path.join(settings.BASE_DIR, runner),
-            workflow_id
-        ], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        self._handlers[watch] = process
-        self.send({'command': 'started', 'id': watch})
-
-    def _start(self, params):
-        workflow_id = params['uuid']
-        watch = str(uuid4())
-        runner = "run.bat" if os.name == "nt" else "run.sh"
-        process = subprocess.Popen([
+        params = [
             os.path.join(settings.BASE_DIR, runner),
             workflow_id,
-            "--step"
-        ], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        self._handlers[watch] = process
+            watch
+        ]
+        if step:
+            params.append("--step")
+        process = subprocess.Popen(params, stdout=subprocess.PIPE, bufsize=1)
+        print "%s.%s" % (workflow_id, watch,)
+        file_handler = open(os.path.join(
+            settings.BASE_DIR,
+            "runner",
+            "status",
+            "%s--.%d" % (workflow_id, process.pid,)), "w+")
+        self._handlers[watch] = file_handler
+        thread = Thread(target=self._update_status, args=(process.stdout, watch,))
+        thread.daemon = True
+        thread.start()
         self.send({'command': 'started', 'id': watch})
 
     def _step(self, params):
         process_id = params['uuid']
         if process_id in self._handlers:
             self._say(process_id, "step")
+
+    def _run(self, params):
+        process_id = params['uuid']
+        if process_id in self._handlers:
+            self._say(process_id, "run")
 
     def _quit(self, params):
         process_id = params['uuid']
@@ -59,36 +73,19 @@ class Handler(JsonWebsocketConsumer):
         if process_id in self._handlers:
             self._say(process_id, "dump")
             sleep(0.1)
-            self.send({
-                'command': 'dump',
-                'content': loads(self._listen(process_id))
-            })
-
-    def _status(self, params):
-        process_id = params['uuid']
-        if process_id in self._handlers:
-            self._handlers[process_id].poll()
-            print "Status for %s is %s" % (process_id, self._handlers[process_id].returncode)
-            if self._handlers[process_id].returncode is not None:
-                self._handlers.pop(process_id)
-                self.send({'command': 'status', "status": "Done"})
-            else:
-                message = self._listen(process_id)
-                if message is None or message == '':
-                    self.send({'command': 'status', "status": "Unchanged"})
-                self.send({'command': 'status', "status": message})
+            pass
 
     def receive(self, content):
         "Handle the command"
         if content['command'] == u"play":
-            self._play(content)
+            self._play(content, False)
         elif content['command'] == u"start":
-            self._start(content)
+            self._play(content, True)
         elif content['command'] == u"step":
             self._step(content)
+        elif content['command'] == u"run":
+            self._run(content)
         elif content['command'] == u"quit":
             self._quit(content)
         elif content['command'] == u"dump":
             self._dump(content)
-        elif content['command'] == u"status":
-            self._status(content)

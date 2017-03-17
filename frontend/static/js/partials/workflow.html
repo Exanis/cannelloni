@@ -8,7 +8,27 @@
             </small>
         </h2>
 
-        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="!playing" aria-label="Jouer le workflow" ng-click="runWorkflow()">
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping" aria-label="Avancer le workflow" ng-click="stepWorkflow()">
+            <md-tooltip md-direction="bottom">Avancer le workflow</md-tooltip>
+            <md-icon md-font-set="material-icons">keyboard_tab</md-icon>
+        </md-button>
+
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping" aria-label="Dérouler le workflow" ng-click="runWorkflow()">
+            <md-tooltip md-direction="bottom">Dérouler le workflow</md-tooltip>
+            <md-icon md-font-set="material-icons">send</md-icon>
+        </md-button>
+
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping" aria-label="Arrêter le workflow" ng-click="stopWorkflow()">
+            <md-tooltip md-direction="bottom">Arrêter le workflow</md-tooltip>
+            <md-icon md-font-set="material-icons">stop</md-icon>
+        </md-button>
+
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="!playing" aria-label="Lancer le workflow pas à pas" ng-click="startWorkflow()">
+            <md-tooltip md-direction="bottom">Lancer le workflow pas à pas</md-tooltip>
+            <md-icon md-font-set="material-icons">skip_next</md-icon>
+        </md-button>
+
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="!playing" aria-label="Jouer le workflow" ng-click="playWorkflow()">
             <md-tooltip md-direction="bottom">Jouer le workflow</md-tooltip>
             <md-icon md-font-set="material-icons">play_arrow</md-icon>
         </md-button>
@@ -32,7 +52,6 @@
         <md-toolbar>
             <div class="md-toolbar-tools">
                 <h4 flex>{{ layer['layer'].name }}</h4>
-                
                 <md-menu>
                     <md-button aria-label="menu" class="md-fab md-hue-3 md-mini" ng-click="$mdMenu.open($event)">
                         <md-tooltip md-direction="top">Menu</md-tooltip>

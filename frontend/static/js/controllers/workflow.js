@@ -205,7 +205,7 @@ app.config(['$routeProvider', function ($routeProvider) {
                             $scope.list.push(variable)
                      });
                  });
-            
+
             $scope.cancel = function () {
                 $mdDialog.cancel();
             };
@@ -256,7 +256,7 @@ app.config(['$routeProvider', function ($routeProvider) {
                                    .targetEvent(ev)
                                    .ok('Supprimer')
                                    .cancel('Annuler');
-            
+
             $mdDialog.show(confirm).then(function () {
                 $http({
                     method: 'DELETE',
@@ -293,7 +293,7 @@ app.config(['$routeProvider', function ($routeProvider) {
                 }
             });
         };
-        
+
         function addLinkCtrl($scope, $mdDialog, namespace) {
             $scope.types = typesList;
             $scope.currentFilter = targetFilter;
@@ -350,7 +350,7 @@ app.config(['$routeProvider', function ($routeProvider) {
                                    .targetEvent(ev)
                                    .ok('Supprimer')
                                    .cancel('Annuler');
-            
+
             $mdDialog.show(confirm).then(function () {
                 $http({
                     method: 'DELETE',
@@ -368,35 +368,59 @@ app.config(['$routeProvider', function ($routeProvider) {
         };
 
         $scope.playing = false;
+        $scope.stepping = false;
         $scope.status = '';
         $scope.currentlyRunning = '';
 
-        $scope.runWorkflow = function () {
+        function _runWorkFlow (cmd) {
             $scope.playing = true;
             $scope.status = 'En attente';
 
-            var statusCheck;
             var watchId;
 
             $websocket.hook('started', function (data) {
                 $scope.status = 'Démarré';
                 watchId = data['id'];
-
-                statusCheck = $interval(function () {
-                    $websocket.send(watchId, 'status');
-                }, 500);
             })
 
             $websocket.hook('status', function (data) {
-                if (data.status !== 'Unchanged')
-                    $scope.status = data.status
-                if (data.status === 'Done') {
-                    $interval.cancel(statusCheck)
-                    $scope.playing = false;
+                console.log(data);
+                if (data.status !== 'Unchanged') {
+                    $scope.status = data.status;
+
+                    if ($scope.status === "Running")
+                        $scope.currentlyRunning = data.filter;
                 }
+                if (data.status === 'Done' || data.status === 'Error') {
+                    $scope.playing = false;
+                    $scope.stepping = false;
+                    $scope.currentlyRunning = '';
+                }
+                $scope.$apply()
             });
 
-            $websocket.send(workflow.get().uuid, "play")
+            $websocket.send(workflow.get().uuid, cmd)
+        };
+
+        $scope.playWorkflow = function () {
+            _runWorkFlow("play");
+        };
+
+        $scope.startWorkflow = function () {
+            $scope.stepping = true;
+            _runWorkFlow("start");
+        };
+
+        $scope.stepWorkflow = function () {
+            $websocket.send(workflow.get().uuid, "step");
+        };
+
+        $scope.runWorkflow = function () {
+            $websocket.send(workflow.get().uuid, "run");
+        };
+
+        $scope.quitWorkflow = function () {
+            $websocket.send(workflow.get().uuid, "quit");
         };
 
         $scope.log = function (ev) {

@@ -4,8 +4,7 @@
 
 import os
 import traceback
-import json
-import sys
+from time import sleep
 from django.utils import timezone
 from backend import models, filters
 from .registery import Registery
@@ -16,18 +15,20 @@ class Runner(object):
     _step = False
     _workflow = None
     _registery = None
+    _commands_file = None
     _logfile = ''
     _pid = 0
 
     _filters = {}
     _ordered_filters = []
 
-    def __init__(self, workflow_uuid, step):
+    def __init__(self, workflow_uuid, watch, step):
         self._workflow = models.Workflow.objects.get(uuid=workflow_uuid)
         self._registery = Registery(self._workflow.namespace.uuid)
         self._logfile = "runner/status/%s.log" % workflow_uuid
         self._step = step
         self._pid = os.getpid()
+        self._watch = watch
 
     def _load_filters(self):
         filters_list = models.Filter.objects.filter(layer__workflow=self._workflow)
@@ -50,9 +51,7 @@ class Runner(object):
                 target['model'].uuid,
             )
         )
-        json.dump({
-            "filter": str(target['model'].uuid)
-        }, sys.stdout)
+        print str(target['model'].uuid)
         for flux in target['model'].links_in:
             target['klass'].input(
                 flux.target_node,
@@ -65,9 +64,7 @@ class Runner(object):
             self._log(
                 "An error occured: %s" % traceback.format_exc()
             )
-            json.dump({
-                'error': traceback.format_exc()
-            }, sys.stdout)
+            print "Error"
             return False
 
     # TODO
@@ -76,18 +73,24 @@ class Runner(object):
 
     def _wait_step(self):
         if self._step:
-            line = raw_input()
-            while line not in ["step", "play", "quit"]:
-                if line == "dump":
+            line = self._commands_file.readline()
+            while line not in ["step\n", "run\n", "quit\n"]:
+                if line == "dump\n":
                     self._dump()
-                line = raw_input()
-            if line == "play":
+                line = self._commands_file.readline()
+            if line == "run\n":
                 self._step = False
-            elif line == "quit":
+            elif line == "quit\n":
                 quit()
 
     def run(self):
         "Run the workflow"
+        sleep(0.1)
+        if self._step:
+            self._commands_file = open("runner/status/%s.%s" % (
+                str(self._workflow.uuid),
+                self._watch,
+            ), "r")
         self._log("Starting workflow execution")
         self._load_filters()
         self._log("Filters loaded")
@@ -99,3 +102,5 @@ class Runner(object):
                     return
                 self._wait_step()
         self._log("Workflow execution ended")
+        if self._commands_file is not None:
+            self._commands_file.close()
