@@ -43,3 +43,12 @@ a.decalled {
     min-height: 12px;
     min-width: 12px
 }
+
+.max-me {
+    min-height: 500px;
+    width: 1000px;
+}
+
+.height_hundred {
+    min-height: 100%;
+}

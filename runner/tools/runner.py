@@ -5,7 +5,8 @@
 import os
 import traceback
 import sys
-from time import sleep
+from json import dump as json_dump
+from uuid import uuid4
 from django.utils import timezone
 from backend import models, filters
 from .registery import Registery
@@ -26,14 +27,14 @@ class Runner(object):
     def __init__(self, workflow_uuid, watch, step):
         self._workflow = models.Workflow.objects.get(uuid=workflow_uuid)
         self._registery = Registery(self._workflow.namespace.uuid)
-        self._logfile = "runner/status/%s.log" % workflow_uuid
+        self._logfile = os.path.join("runner", "status", "%s.log" % workflow_uuid)
         self._step = step
         self._pid = os.getpid()
         self._watch = watch
-        self._commands_file = "runner/status/%s.%s" % (
+        self._commands_file = os.path.join("runner", "status", "%s.%s" % (
             str(self._workflow.uuid),
             self._watch,
-        )
+        ))
 
     def _load_filters(self):
         filters_list = models.Filter.objects.filter(layer__workflow=self._workflow)
@@ -75,9 +76,23 @@ class Runner(object):
             sys.stdout.flush()
             return False
 
-    # TODO
     def _dump(self):
-        pass
+        dump = {
+            "variables": self._registery.dump_variables(),
+            "filters": [{
+                "name": fil['model'].name,
+                "dump": fil['klass'].dump()
+            } for fil in self._ordered_filters],
+            "misc": {
+                "status": self._registery.is_done()
+            }
+        }
+        target = uuid4()
+        dump_target = os.path.join("runner", "status", "%s.dump" % str(target))
+        with open(dump_target, 'w+') as dump_target:
+            json_dump(dump, dump_target)
+        print "dump %s" % str(target)
+        sys.stdout.flush()
 
     # Note: we are not using a pipe here as subprocess.Popen seems
     # to bug when stdin and stdout are filed on python 2.7 on windows
@@ -95,6 +110,7 @@ class Runner(object):
             while line not in ["step", "run", "quit"]:
                 if line == "dump":
                     self._dump()
+                    self._consume_command()
                 line = self._read_a_line()
             if line == "run":
                 self._step = False

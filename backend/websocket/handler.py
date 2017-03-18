@@ -4,6 +4,8 @@
 
 import os
 import subprocess
+import json
+import re
 from time import sleep
 from uuid import uuid4
 from threading import Thread
@@ -15,14 +17,36 @@ class Handler(JsonWebsocketConsumer):
 
     _handlers = {}
 
-    def _update_status(self, flux):
+    def _read_dump(self, target):
+        dump_file = os.path.join(
+            settings.BASE_DIR,
+            "runner",
+            "status",
+            "%s.dump" % target
+        )
+        with open(dump_file, "r") as dump_fp:
+            dump_string = dump_fp.read()
+        self.send({
+            'command': 'dump',
+            'dump': json.loads(dump_string)
+        })
+        os.remove(dump_file)
+
+    def _update_status(self, flux, watch):
         for line in iter(flux.readline, b''):
             line = line.strip()
-            if line == "Error":
+            if line == "Error\n":
                 self.send({'command': 'status', "status": "Error"})
             else:
-                self.send({'command': 'status', "status": "Running", "filter": line})
+                search = re.search(r'^dump ([a-z0-9\-]+)', line)
+                if search is not None:
+                    self._read_dump(search.group(1))
+                else:
+                    self.send({'command': 'status', "status": "Running", "filter": line})
         self.send({'command': 'status', "status": "Done"})
+        if self._handlers[watch] != '':
+            os.remove(self._handlers[watch])
+        self._handlers.pop(watch)
 
     def _say(self, uuid, command):
         with open(self._handlers[uuid], 'w') as target:
@@ -46,9 +70,11 @@ class Handler(JsonWebsocketConsumer):
             params.append("--step")
             with open(command_file_path, 'w+') as _: # Just create file
                 pass
+            self._handlers[watch] = command_file_path
+        else:
+            self._handlers[watch] = ''
         process = subprocess.Popen(params, stdout=subprocess.PIPE, bufsize=1)
-        self._handlers[watch] = command_file_path
-        thread = Thread(target=self._update_status, args=(process.stdout,))
+        thread = Thread(target=self._update_status, args=(process.stdout, watch))
         thread.daemon = True
         thread.start()
         self.send({'command': 'started', 'id': watch})

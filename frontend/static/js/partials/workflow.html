@@ -8,17 +8,22 @@
             </small>
         </h2>
 
-        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping" aria-label="Avancer le workflow" ng-click="stepWorkflow()">
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping && started" aria-label="Prendre un instantané" ng-click="dumpWorkflow()">
+            <md-tooltip md-direction="bottom">Prendre un instantané</md-tooltip>
+            <md-icon md-font-set="material-icons">search</md-icon>
+        </md-button>
+
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping && started" aria-label="Avancer le workflow" ng-click="stepWorkflow()">
             <md-tooltip md-direction="bottom">Avancer le workflow</md-tooltip>
             <md-icon md-font-set="material-icons">keyboard_tab</md-icon>
         </md-button>
 
-        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping" aria-label="Dérouler le workflow" ng-click="runWorkflow()">
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping && started" aria-label="Dérouler le workflow" ng-click="runWorkflow()">
             <md-tooltip md-direction="bottom">Dérouler le workflow</md-tooltip>
             <md-icon md-font-set="material-icons">send</md-icon>
         </md-button>
 
-        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping" aria-label="Arrêter le workflow" ng-click="quitWorkflow()">
+        <md-button class="md-icon-button md-fab md-hue-3 md-mini" ng-if="stepping && started" aria-label="Arrêter le workflow" ng-click="quitWorkflow()">
             <md-tooltip md-direction="bottom">Arrêter le workflow</md-tooltip>
             <md-icon md-font-set="material-icons">stop</md-icon>
         </md-button>

@@ -40,3 +40,27 @@ class AbstractFilter(object):
     def run(self):
         "Run the filter. This method shall be overrided"
         pass
+
+    def dump(self):
+        "Dump datas about this filter"
+        return {
+            "type": self.name,
+            "nodes_in": [
+                {
+                    "name": node,
+                    "value": self._flux_in[node] if node in self._flux_in else {
+                        "headers": [],
+                        "rows": []
+                    }
+                } for node in self.node_in
+            ],
+            "nodes_out": [
+                {
+                    "name": node,
+                    "value": self._flux_in[node] if node in self._flux_in else {
+                        "headers": [],
+                        "rows": []
+                    }
+                } for node in self.node_out
+            ]
+        }

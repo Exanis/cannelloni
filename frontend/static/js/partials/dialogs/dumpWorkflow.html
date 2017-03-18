@@ -1,0 +1,72 @@
+<md-dialog aria-label="Instantané de workflow">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 flex>Instantané de workflow</h2>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-tooltip md-direction="left">Fermer</md-tooltip>
+                    <md-icon md-font-set="material-icons">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content md-truncate class="max-me" flex>
+            <md-tabs md-dynamic-height flex>
+                <md-tab label="Variables" flex>
+                    <md-content class="md-padding height_hundred" flex md-truncate>
+                        <md-list flex>
+                            <md-list-item class="md-2-line md-dense" ng-repeat="variable in data.variables">
+                                <div class="md-list-item-text">
+                                    <h3>{{ variable.name }}</h3>
+                                    <p>{{ variable.value }}</p>
+                                </div>
+                            </md-list-item>
+                        </md-list>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Filtres">
+                    <md-content layout="row" class="height_hundred" md-truncate>
+                        <md-sidenav
+                            class="md-sidenav-left md-padding"
+                            md-is-locked-open="$mdMedia('gt-md')"
+                            md-whiteframe="4">
+                            <div ng-repeat="filter in data.filters">
+                                <h4 ng-click="showFilterNodes(filter)">{{ filter.name }}</h4>
+                                <div ng-if="showingFilter == filter">
+                                    <div ng-if="filter.dump.nodes_in.length > 0">
+                                        <h5>Noeuds entrants</h5>
+                                        <md-button ng-repeat="node in filter.dump.nodes_in" ng-click="showNode(node.value)">{{ node.name }}</md-button>
+                                    </div>
+                                    <div ng-if="filter.dump.nodes_out.length > 0">
+                                        <h5>Noeuds sortants</h5>
+                                        <md-button ng-repeat="node in filter.dump.nodes_out" ng-click="showNode(node.value)">{{ node.name }}</md-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </md-sidenav>
+                        <md-content flex class="md-padding">
+                            <p ng-if="!displayedNode">Sélectionnez un noeud à examiner</p>
+                            <table ng-if="displayedNode !== false">
+                                <thead>
+                                    <tr>
+                                        <th ng-repeat="header in displayedNode.headers">{{ header }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="row in displayedNode.rows">
+                                        <td ng-repeat="cell in row">{{ cell }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </md-content>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Autres">
+                    <md-content class="md-padding">
+                        <strong>Recommencer le workflow</strong>: {{ data.misc.status ? "Non" : "Oui" }}
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </md-dialog-content>
+    </form>
+</md-dialog>

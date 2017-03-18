@@ -17,7 +17,8 @@ app.config(['$routeProvider', function ($routeProvider) {
     '$interval',
     '$anchorScroll',
     '$websocket',
-    function ($scope, $http, $httpParamSerializer, namespace, workflow, $mdDialog, $mdToast, $location, $interval, $anchorScroll, $websocket) {
+    'dump',
+    function ($scope, $http, $httpParamSerializer, namespace, workflow, $mdDialog, $mdToast, $location, $interval, $anchorScroll, $websocket, dump) {
         if (namespace.get() === '') {
             $location.path('namespace');
             return ;
@@ -369,6 +370,7 @@ app.config(['$routeProvider', function ($routeProvider) {
 
         $scope.playing = false;
         $scope.stepping = false;
+        $scope.started = false;
         $scope.status = '';
         $scope.currentlyRunning = '';
 
@@ -388,15 +390,46 @@ app.config(['$routeProvider', function ($routeProvider) {
                     $scope.status = data.status;
 
                     if ($scope.status === "Running") {
+                        $scope.started = true;
                         $scope.currentlyRunning = data.filter;
                     }
                 }
                 if (data.status === 'Done' || data.status === 'Error') {
+                    $scope.started = true;
                     $scope.playing = false;
                     $scope.stepping = false;
                     $scope.currentlyRunning = '';
                 }
                 $scope.$apply();
+            });
+
+            function dumpHandler($scope, $mdDialog, dump) {
+                $scope.data = dump.get();
+                $scope.showingFilter = null;
+                $scope.displayedNode = false;
+
+                $scope.cancel = function () {
+                    $mdDialog.cancel;
+                }
+
+                $scope.showFilterNodes = function (filter) {
+                    $scope.showingFilter = filter;
+                }
+
+                $scope.showNode = function (node) {
+                    $scope.displayedNode = node;
+                }
+            }
+
+            $websocket.hook('dump', function (data) {
+                dump.set(data.dump);
+                
+                $mdDialog.show({
+                    controller: ['$scope', '$mdDialog', 'dump', dumpHandler],
+                    templateUrl: getPath('js/partials/dialogs/dumpWorkflow.html'),
+                    parent: angular.element(document.body),
+                    clickOutsideToClose: true
+                });
             });
 
             $websocket.send(workflow.get().uuid, cmd)
@@ -421,6 +454,10 @@ app.config(['$routeProvider', function ($routeProvider) {
 
         $scope.quitWorkflow = function () {
             $websocket.send(watchId, "quit");
+        };
+
+        $scope.dumpWorkflow = function () {
+            $websocket.send(watchId, "dump");
         };
 
         $scope.log = function (ev) {
