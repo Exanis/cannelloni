@@ -370,7 +370,7 @@ app.config(['$routeProvider', function ($routeProvider) {
         $scope.playing = false;
         $scope.stepping = false;
         $scope.status = '';
-        $scope.currentlyRunning = '22eb5a0f-56f5-41f8-8275-02ea2f551401';
+        $scope.currentlyRunning = '';
 
         var watchId;
 
