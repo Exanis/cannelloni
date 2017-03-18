@@ -23,7 +23,7 @@ app.config(['$routeProvider', function ($routeProvider) {
         
         $scope.choose = function (target) {
             namespace.set(target);
-            $location.path('variables');
+            $location.path('workflows');
         };
 
         $scope.add = function (ev) {
