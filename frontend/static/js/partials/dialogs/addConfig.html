@@ -11,16 +11,18 @@
         </md-toolbar>
 
         <md-dialog-content>
-            <md-input-container>
-                <label>Variable</label>
-                <md-select ng-model="target">
-                    <md-option ng-repeat="variable in list" ng-value="variable.uuid">{{ variable.name }}</md-option>
-                </md-select>
-            </md-input-container><br />
-            
-            <div class="text-center">
-                <md-button class="md-raised md-primary" ng-click="choose()">Choisir</md-button>
-            </div>
+            <md-container class="md-padding" layout="column">
+                <md-input-container>
+                    <label>Variable</label>
+                    <md-select ng-model="target">
+                        <md-option ng-repeat="variable in list" ng-value="variable.uuid">{{ variable.name }}</md-option>
+                    </md-select>
+                </md-input-container>
+                
+                <div class="text-center">
+                    <md-button class="md-raised md-primary" ng-click="choose()">Choisir</md-button>
+                </div>
+            </md-container>
         </md-dialog-content>
     </form>
 </md-dialog>

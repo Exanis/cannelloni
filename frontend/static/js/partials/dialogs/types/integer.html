@@ -11,15 +11,16 @@
         </md-toolbar>
 
         <md-dialog-content>
-            <br />
-            <md-input-container>
-                <label>Nouvelle valeur</label>
-                <input ng-model="value" type="number" step="1" />
-            </md-input-container><br />
+            <md-content layout="column" class="md-padding">
+                <md-input-container>
+                    <label>Nouvelle valeur</label>
+                    <input ng-model="value" type="number" step="1" />
+                </md-input-container>
 
-            <div class="text-center">
-                <md-button class="md-raised md-primary" ng-click="send()">Mettre à jour</md-button>
-            </div>
+                <div class="text-center">
+                    <md-button class="md-raised md-primary" ng-click="send()">Mettre à jour</md-button>
+                </div>
+            </md-content>
         </md-dialog-content>
     </form>
 </md-dialog>

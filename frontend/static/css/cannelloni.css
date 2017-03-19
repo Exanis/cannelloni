@@ -52,3 +52,7 @@ a.decalled {
 .height_hundred {
     min-height: 100%;
 }
+
+md-toast {
+    position: fixed !important;
+}

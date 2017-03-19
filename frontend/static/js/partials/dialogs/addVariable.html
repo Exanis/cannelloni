@@ -11,22 +11,23 @@
         </md-toolbar>
 
         <md-dialog-content>
-            <br />
-            <md-input-container>
-                <label>Nom</label>
-                <input ng-model="name" />
-            </md-input-container><br />
+            <md-container class="md-padding" layout="column">
+                <md-input-container>
+                    <label>Nom</label>
+                    <input ng-model="name" />
+                </md-input-container>
 
-            <md-input-container>
-                <label>Type</label>
-                <md-select ng-model="type_class">
-                    <md-option ng-repeat="type in types" ng-value="type.slug">{{ type.name }}</md-option>
-                </md-select>
-            </md-input-container>
+                <md-input-container>
+                    <label>Type</label>
+                    <md-select ng-model="type_class">
+                        <md-option ng-repeat="type in types" ng-value="type.slug">{{ type.name }}</md-option>
+                    </md-select>
+                </md-input-container>
 
-            <div class="text-center">
-                <md-button class="md-raised md-primary" ng-click="create()">Créer</md-button>
-            </div>
+                <div class="text-center">
+                    <md-button class="md-raised md-primary" ng-click="create()">Créer</md-button>
+                </div>
+            </md-container>
         </md-dialog-content>
     </form>
 </md-dialog>

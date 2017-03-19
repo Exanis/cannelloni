@@ -1,7 +1,7 @@
 'use strict';
 
 typesCtrl['file'] = ['$scope', '$mdDialog', 'variable', '$http', '$httpParamSerializer', '$mdToast', 'Upload', function ($scope, $mdDialog, variable, $http, $httpParamSerializer, $mdToast, Upload) {
-    $scope.filename = 'Cliquez ou glisser un fichier ici';
+    $scope.filename = 'Cliquez ou glissez un fichier ici';
     $scope.file = {};
     $scope.showPercent = false;
     $scope.percent = 0;

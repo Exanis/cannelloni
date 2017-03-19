@@ -11,17 +11,17 @@
         </md-toolbar>
 
         <md-dialog-content>
-            <br />
-            <div ngf-drop="onSelectFile()" ng-model="file" ngf-select="onSelectFile()" class="well">
-                {{ filename }}
-            </div>
-            
-            <md-progress-linear md-mode="determinate" value="{{ percent }}" ng-if="showPercent"></md-progress-linear>
-            <br />
+            <md-content layout="column" class="md-padding">
+                <div ngf-drop="onSelectFile()" ng-model="file" ngf-select="onSelectFile()" class="well">
+                    {{ filename }}
+                </div>
+                
+                <md-progress-linear md-mode="determinate" value="{{ percent }}" ng-if="showPercent"></md-progress-linear>
 
-            <div class="text-center">
-                <md-button class="md-raised md-primary" ng-click="send()">Mettre à jour</md-button>
-            </div>
+                <div class="text-center">
+                    <md-button class="md-raised md-primary" ng-click="send()">Mettre à jour</md-button>
+                </div>
+            </md-content>
         </md-dialog-content>
     </form>
 </md-dialog>
